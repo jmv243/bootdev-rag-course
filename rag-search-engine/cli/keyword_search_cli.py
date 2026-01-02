@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import json
 
 
 def main() -> None:
@@ -18,8 +19,21 @@ def main() -> None:
             print('Searching for:', args.query)
             pass
         case _:
-            parser.print_help()
+            parser.print_help()    
 
+    #code added for simple search
+    data = {}
+    with open('./data/movies.json', 'r') as file:
+        data = json.load(file)       
+
+    hits = 0
+    for movie in data['movies']:
+        if args.query in movie['title']:
+            print(movie['title'])
+            hits += 1
+
+        if hits >= 5:
+            break
 
 if __name__ == "__main__":
     main()
