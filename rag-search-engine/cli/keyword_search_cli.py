@@ -11,15 +11,20 @@ def search_movies(query: str):
 
     translator = str.maketrans('', '', string.punctuation)
     hits = 0
-    for movie in data['movies']:
-        query_clean = query.lower().translate(translator)
-        title_clean = movie['title'].lower().translate(translator)
-        if query_clean in title_clean:
-            print(movie['title'])
-            hits += 1
 
-        if hits >= 5:
-            break
+    #clean and get query tokens
+    query_clean = query.lower().translate(translator)
+    query_tokens = query_clean.split(' ')
+
+    for movie in data['movies']:
+        title_clean = movie['title'].lower().translate(translator)        
+
+        for qt in query_tokens:
+            if hits >= 5:
+                return
+            if qt in title_clean:
+                print(movie['title'])
+                hits += 1            
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Keyword Search CLI")
