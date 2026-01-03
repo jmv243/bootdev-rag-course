@@ -2,7 +2,24 @@
 
 import argparse
 import json
+import string
 
+def search_movies(query: str):
+    data = {}
+    with open('./data/movies.json', 'r') as file:
+        data = json.load(file)       
+
+    translator = str.maketrans('', '', string.punctuation)
+    hits = 0
+    for movie in data['movies']:
+        query_clean = query.lower().translate(translator)
+        title_clean = movie['title'].lower().translate(translator)
+        if query_clean in title_clean:
+            print(movie['title'])
+            hits += 1
+
+        if hits >= 5:
+            break
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Keyword Search CLI")
@@ -19,21 +36,9 @@ def main() -> None:
             print('Searching for:', args.query)
             pass
         case _:
-            parser.print_help()    
+            parser.print_help()
 
-    #code added for simple search
-    data = {}
-    with open('./data/movies.json', 'r') as file:
-        data = json.load(file)       
-
-    hits = 0
-    for movie in data['movies']:
-        if args.query in movie['title']:
-            print(movie['title'])
-            hits += 1
-
-        if hits >= 5:
-            break
+    search_movies(args.query)
 
 if __name__ == "__main__":
     main()
