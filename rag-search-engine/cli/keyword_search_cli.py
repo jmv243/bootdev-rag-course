@@ -1,52 +1,9 @@
 #!/usr/bin/env python3
 
 import argparse
-import json
-import string
-from nltk.stem import PorterStemmer
 
-stop_words = []
+from lib.keyword_search import search_command
 
-def clean_tokens(tokens: list[str]):
-    if len(stop_words) < 1:
-        with open('./data/stopwords.txt', 'r') as file:
-            for line in file:
-                stop_words.append(line.strip())
-
-    stemmer = PorterStemmer()
-
-    # Clear and rebuild the list with stemmed, non-stop-word tokens
-    cleaned = [stemmer.stem(token) for token in tokens if token not in stop_words]
-    tokens.clear()
-    tokens.extend(cleaned)
-
-def search_movies(query: str):
-    with open('./data/movies.json', 'r') as file:
-        data = json.load(file)           
-
-    translator = str.maketrans('', '', string.punctuation)    
-
-    #clean and get query tokens
-    query_clean = query.lower().translate(translator)
-    query_tokens = query_clean.split(' ')
-
-    clean_tokens(query_tokens)
-
-    hits = 0
-    for movie in data['movies']:
-        if hits >= 5:
-            return
-        
-        title_clean = movie['title'].lower().translate(translator)        
-        title_tokens = title_clean.split(' ')
-
-        clean_tokens(title_tokens)
-
-        for qt in query_tokens:
-            if qt in title_tokens:
-                print(movie['title'])
-                hits += 1 
-                break
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Keyword Search CLI")
@@ -59,13 +16,13 @@ def main() -> None:
 
     match args.command:
         case "search":
-            # print the search query here
-            print('Searching for:', args.query)
-            pass
+            print("Searching for:", args.query)
+            results = search_command(args.query)
+            for i, res in enumerate(results, 1):
+                print(f"{i}. {res['title']}")
         case _:
             parser.print_help()
 
-    search_movies(args.query)
 
 if __name__ == "__main__":
     main()
